@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#2563eb" />
+<title>Treino de Provas — 5º ano</title>
+<style>
+  :root{
+    --bg:#f4f6fb; --card:#ffffff; --ink:#1e293b; --muted:#64748b;
+    --primary:#2563eb; --primary-d:#1d4ed8;
+    --green:#16a34a; --green-bg:#ecfdf5; --green-b:#a7f3d0;
+    --red:#dc2626; --red-bg:#fef2f2; --red-b:#fecaca;
+    --amber:#f59e0b; --tip:#eef2ff; --tip-b:#c7d2fe;
+    --shadow:0 2px 10px rgba(30,41,59,.08);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:var(--bg); color:var(--ink); font-size:17px; line-height:1.5;
+    min-height:100vh; touch-action:manipulation;
+  }
+  .hidden{display:none !important}
+  .wrap{max-width:640px;margin:0 auto;padding:14px 12px 40px}
+  header.app{
+    position:sticky;top:0;z-index:50;color:#fff;
+    background:linear-gradient(135deg,var(--primary),#4f46e5);
+    padding:12px 14px;box-shadow:var(--shadow);
+  }
+  header.app h1{margin:0;font-size:18px;font-weight:800}
+  header.app .sub{font-size:12.5px;opacity:.92;margin-top:2px}
+  .bar{height:9px;background:rgba(255,255,255,.28);border-radius:99px;overflow:hidden;margin-top:8px}
+  .bar > i{display:block;height:100%;width:0;background:#fff;border-radius:99px;transition:width .25s}
+  .hrow{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .hstats{display:flex;gap:8px;font-size:13px;font-weight:700;margin-top:6px}
+  .hstats span{background:rgba(255,255,255,.18);padding:2px 10px;border-radius:99px}
+  .xbtn{
+    background:rgba(255,255,255,.18);border:none;color:#fff;font-size:16px;font-weight:800;
+    width:34px;height:34px;border-radius:50%;cursor:pointer;flex:0 0 auto;
+  }
+  .card{
+    background:var(--card);border-radius:16px;padding:16px;box-shadow:var(--shadow);margin-bottom:14px;
+  }
+  .center{text-align:center}
+  h2.title{margin:2px 0 12px;font-size:19px;font-weight:800}
+  .subj-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .subj{
+    border:none;border-radius:16px;padding:14px 10px;cursor:pointer;text-align:center;
+    background:var(--card);box-shadow:var(--shadow);border-top:5px solid var(--ac,#2563eb);
+    display:flex;flex-direction:column;align-items:center;gap:4px;min-height:112px;justify-content:center;
+  }
+  .subj .em{font-size:34px;line-height:1}
+  .subj .nm{font-weight:800;font-size:15.5px}
+  .subj .dt{font-size:12px;color:var(--muted);font-weight:600}
+  .subj .rec{font-size:11.5px;color:var(--primary-d);font-weight:700}
+  .chiprow{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 2px}
+  .chip{
+    flex:1 1 calc(50% - 8px);min-height:52px;border-radius:14px;border:2px solid #e2e8f0;
+    background:#fff;font-size:15.5px;font-weight:700;color:var(--ink);cursor:pointer;padding:8px;
+  }
+  .chip small{display:block;font-weight:600;color:var(--muted);font-size:12px}
+  .chip.sel{border-color:var(--primary);background:#e0e7ff;color:var(--primary-d)}
+  .go{
+    width:100%;min-height:54px;border:none;border-radius:14px;background:var(--primary);color:#fff;
+    font-size:17.5px;font-weight:800;cursor:pointer;box-shadow:var(--shadow);margin-top:10px;
+  }
+  .go:disabled{opacity:.5}
+  .ghost{
+    width:100%;min-height:48px;border:2px solid #e2e8f0;border-radius:14px;background:#fff;
+    font-size:15.5px;font-weight:700;color:var(--ink);cursor:pointer;margin-top:10px;
+  }
+  .back{
+    background:none;border:none;color:var(--primary-d);font-weight:700;font-size:14.5px;
+    cursor:pointer;padding:6px 0;margin-bottom:4px;
+  }
+  .qtop{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+  .tag{font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;background:#e0e7ff;color:var(--primary-d)}
+  .tag.lvl-f{background:#dcfce7;color:#15803d}
+  .tag.lvl-m{background:#fef3c7;color:#b45309}
+  .tag.lvl-d{background:#fee2e2;color:#b91c1c}
+  .qtext{font-size:17.5px;font-weight:700;margin:0 0 14px;white-space:pre-line}
+  .alts{display:flex;flex-direction:column;gap:9px}
+  .alt{
+    display:flex;align-items:center;gap:10px;text-align:left;width:100%;
+    border:2px solid #e2e8f0;border-radius:14px;background:#fff;padding:12px;
+    font-size:16px;color:var(--ink);cursor:pointer;min-height:52px;line-height:1.4;
+  }
+  .alt .L{
+    flex:0 0 28px;height:28px;border-radius:50%;background:#eef2ff;color:var(--primary-d);
+    font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;
+  }
+  .alt.ok{border-color:var(--green);background:var(--green-bg)}
+  .alt.ok .L{background:var(--green);color:#fff}
+  .alt.no{border-color:var(--red);background:var(--red-bg)}
+  .alt.no .L{background:var(--red);color:#fff}
+  .alt:disabled{cursor:default;opacity:1}
+  .alt.dim{opacity:.55}
+  .verdict{font-size:16.5px;font-weight:800;margin:12px 0 0}
+  .verdict.ok{color:var(--green)} .verdict.no{color:var(--red)}
+  .whybtn{
+    margin-top:10px;width:100%;min-height:46px;border-radius:12px;cursor:pointer;
+    border:2px dashed var(--tip-b);background:var(--tip);color:#3730a3;font-weight:700;font-size:15px;
+  }
+  .why{
+    margin-top:10px;background:var(--tip);border:1px solid var(--tip-b);border-radius:12px;
+    padding:12px;font-size:15.5px;color:#312e81;
+  }
+  .nextbar{position:sticky;bottom:10px;margin-top:14px}
+  .ring{width:150px;height:150px;margin:6px auto}
+  .ring text{font-size:26px;font-weight:800;fill:var(--ink)}
+  .bigmoji{font-size:52px;line-height:1;margin:4px 0}
+  .score-msg{font-size:18px;font-weight:800;margin:6px 0 2px}
+  .score-sub{color:var(--muted);font-size:14px;margin-bottom:10px}
+  .pillrow{display:flex;gap:10px;justify-content:center;margin:10px 0}
+  .pill{border-radius:14px;padding:10px 18px;font-weight:800;font-size:15px}
+  .pill.g{background:var(--green-bg);color:#15803d;border:1px solid var(--green-b)}
+  .pill.r{background:var(--red-bg);color:#b91c1c;border:1px solid var(--red-b)}
+  .wrongcard{
+    text-align:left;width:100%;border:2px solid #e2e8f0;border-radius:14px;background:#fff;
+    padding:12px;cursor:pointer;margin-bottom:9px;font-size:14.5px;
+  }
+  .wrongcard b{display:block;font-size:14.5px;margin-bottom:2px}
+  .wrongcard .t{color:var(--muted);font-size:12.5px;font-weight:700}
+  .rev-ans{border-radius:12px;padding:10px 12px;margin-top:8px;font-size:15px;border:2px solid}
+  .rev-ans.mine{border-color:var(--red-b);background:var(--red-bg);color:#b91c1c}
+  .rev-ans.right{border-color:var(--green-b);background:var(--green-bg);color:#15803d}
+  .rev-ans b{font-size:12.5px;text-transform:uppercase;letter-spacing:.4px;display:block}
+  .navrow{display:flex;gap:10px;margin-top:10px}
+  .navrow button{flex:1}
+  .loading{text-align:center;padding:40px 0;color:var(--muted);font-weight:700}
+  .spin{
+    width:38px;height:38px;border-radius:50%;margin:0 auto 12px;
+    border:4px solid #e2e8f0;border-top-color:var(--primary);animation:sp 1s linear infinite;
+  }
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .confetti{position:fixed;top:-40px;font-size:24px;z-index:99;animation:fall linear forwards;pointer-events:none}
+  @keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+  .footer-note{text-align:center;color:var(--muted);font-size:12.5px;margin-top:18px}
+</style>
+</head>
+<body>
+
+<header class="app">
+  <div class="hrow">
+    <div>
+      <h1 id="hTitle">🏆 Treino de Provas</h1>
+      <div class="sub" id="hSub">2ªs avaliações do 2º trimestre — 5º ano</div>
+    </div>
+    <button class="xbtn hidden" id="btnQuit" aria-label="Sair do treino">✕</button>
+  </div>
+  <div class="bar hidden" id="hBarWrap"><i id="hBar"></i></div>
+  <div class="hstats hidden" id="hStats">
+    <span id="hCount">1/10</span><span id="hOk">✅ 0</span><span id="hNo">❌ 0</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- HOME -->
+  <div id="scrHome">
+    <div class="card">
+      <b>Oi, Gustavo! 👋</b> Escolha a matéria que você quer treinar.
+      Cada treino sorteia questões novas — pode jogar quantas vezes quiser!
+    </div>
+    <div class="subj-grid" id="subjGrid"></div>
+    <p class="footer-note">Feito com ❤️ pelo papai • Boa prova! 🍀</p>
+  </div>
+
+  <!-- SETUP -->
+  <div id="scrSetup" class="hidden">
+    <button class="back" id="btnBackHome">← Trocar matéria</button>
+    <div class="card">
+      <h2 class="title" id="setupTitle">🔢 Matemática</h2>
+      <b style="font-size:15px">Nível das questões</b>
+      <div class="chiprow" id="lvlRow">
+        <button class="chip" data-lvl="f">🟢 Fácil</button>
+        <button class="chip" data-lvl="m">🟡 Médio</button>
+        <button class="chip" data-lvl="d">🔴 Difícil</button>
+        <button class="chip sel" data-lvl="x">🌈 Misturado</button>
+      </div>
+      <b style="font-size:15px;display:block;margin-top:12px">Quantas questões?</b>
+      <div class="chiprow" id="cntRow">
+        <button class="chip" data-cnt="10">10 <small>rapidinho</small></button>
+        <button class="chip sel" data-cnt="20">20 <small>treino bom</small></button>
+        <button class="chip" data-cnt="30">30 <small>reforçado</small></button>
+        <button class="chip" data-cnt="0">Tudo <small id="allCount">todas</small></button>
+      </div>
+      <button class="go" id="btnStart">Começar! 🚀</button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div id="scrLoad" class="hidden">
+    <div class="loading"><div class="spin"></div>Preparando as questões…</div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="scrQuiz" class="hidden">
+    <div class="card">
+      <div class="qtop">
+        <span class="tag" id="qTopic">Tópico</span>
+        <span class="tag" id="qLvl">Fácil</span>
+      </div>
+      <p class="qtext" id="qText"></p>
+      <div class="alts" id="qAlts"></div>
+      <p class="verdict hidden" id="qVerdict"></p>
+      <button class="whybtn hidden" id="btnWhy">💡 Entender a resposta</button>
+      <div class="why hidden" id="qWhy"></div>
+    </div>
+    <div class="nextbar">
+      <button class="go hidden" id="btnNext">Próxima ➜</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="scrResult" class="hidden">
+    <div class="card center">
+      <div class="bigmoji" id="rEmoji">🏆</div>
+      <svg class="ring" viewBox="0 0 120 120">
+        <circle cx="60" cy="60" r="52" fill="none" stroke="#e2e8f0" stroke-width="12"/>
+        <circle id="ringFg" cx="60" cy="60" r="52" fill="none" stroke="#16a34a" stroke-width="12"
+          stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7"
+          transform="rotate(-90 60 60)" style="transition:stroke-dashoffset 1s ease"/>
+        <text x="60" y="68" text-anchor="middle" id="ringTxt">0%</text>
+      </svg>
+      <div class="score-msg" id="rMsg"></div>
+      <div class="score-sub" id="rRecord"></div>
+      <div class="pillrow">
+        <span class="pill g" id="rOk">✅ 0 certas</span>
+        <span class="pill r" id="rNo">❌ 0 erradas</span>
+      </div>
+    </div>
+    <div class="card hidden" id="rWrongBox">
+      <h2 class="title">🔎 Questões que você errou</h2>
+      <p style="font-size:14px;color:var(--muted);margin:0 0 10px">Toque numa questão para rever e entender.</p>
+      <div id="rWrongList"></div>
+      <button class="go" id="btnRetryWrong">🔁 Refazer as que errei</button>
+    </div>
+    <button class="ghost" id="btnAgain">🎲 Novo treino (mesma matéria)</button>
+    <button class="ghost" id="btnHome">🏠 Escolher outra matéria</button>
+  </div>
+
+  <!-- REVIEW -->
+  <div id="scrReview" class="hidden">
+    <button class="back" id="btnBackResult">← Voltar ao resultado</button>
+    <div class="card">
+      <div class="qtop">
+        <span class="tag" id="revCount">1 de 3</span>
+        <span class="tag" id="revTopic">Tópico</span>
+      </div>
+      <p class="qtext" id="revText"></p>
+      <div class="rev-ans mine"><b>❌ Sua resposta</b><span id="revMine"></span></div>
+      <div class="rev-ans right"><b>✅ Resposta certa</b><span id="revRight"></span></div>
+      <div class="why" style="margin-top:10px"><span id="revWhy"></span></div>
+      <div class="navrow">
+        <button class="ghost" id="btnRevPrev">← Anterior</button>
+        <button class="ghost" id="btnRevNext">Próxima →</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const SUBJECTS = [
+  {slug:"portugues",  nome:"Português",  emoji:"📖", cor:"#dc2626", data:"prova 17/8"},
+  {slug:"historia",   nome:"História",   emoji:"🏺", cor:"#b45309", data:"prova 18/8"},
+  {slug:"matematica", nome:"Matemática", emoji:"🔢", cor:"#2563eb", data:"prova 19/8"},
+  {slug:"ingles",     nome:"Inglês",     emoji:"🦁", cor:"#16a34a", data:"prova 20/8"},
+  {slug:"ciencias",   nome:"Ciências",   emoji:"🫀", cor:"#7c3aed", data:"prova 21/8"},
+  {slug:"geografia",  nome:"Geografia",  emoji:"🗺️", cor:"#0d9488", data:"prova 24/8"},
+];
+const LVL_NAME = {f:"🟢 Fácil", m:"🟡 Médio", d:"🔴 Difícil", x:"🌈 Misturado"};
+
+const $ = id => document.getElementById(id);
+const screens = ["scrHome","scrSetup","scrLoad","scrQuiz","scrResult","scrReview"];
+function show(id){
+  screens.forEach(s => $(s).classList.toggle("hidden", s!==id));
+  const inQuiz = (id==="scrQuiz");
+  $("btnQuit").classList.toggle("hidden", !inQuiz);
+  $("hBarWrap").classList.toggle("hidden", !inQuiz);
+  $("hStats").classList.toggle("hidden", !inQuiz);
+  window.scrollTo(0,0);
+}
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+function esc(s){ const d=document.createElement("div"); d.textContent=s; return d.innerHTML; }
+
+// ---------- state ----------
+let subj = null;          // subject config
+let cfgLvl = "x", cfgCnt = 20;
+let session = [];         // [{src, alts, correct, answered}]
+let idx = 0, hits = 0, misses = 0;
+let wrongs = [];          // [{src, alts, correct, chosen}]
+let revIdx = 0;
+
+// ---------- persistence ----------
+function recKey(slug){ return "treino5_rec_"+slug; }
+function getRec(slug){ try{ return JSON.parse(localStorage.getItem(recKey(slug))||"null"); }catch(e){ return null; } }
+function setRec(slug, pct){
+  const cur = getRec(slug);
+  const jogos = (cur?cur.jogos:0)+1;
+  const best = Math.max(cur?cur.best:0, pct);
+  try{ localStorage.setItem(recKey(slug), JSON.stringify({best, jogos})); }catch(e){}
+  return {best, jogos, isNew: !cur || pct>cur.best};
+}
+
+// ---------- home ----------
+function renderHome(){
+  const g = $("subjGrid"); g.innerHTML = "";
+  SUBJECTS.forEach(s=>{
+    const b = document.createElement("button");
+    b.className = "subj"; b.style.setProperty("--ac", s.cor);
+    const rec = getRec(s.slug);
+    b.innerHTML = `<span class="em">${s.emoji}</span><span class="nm">${s.nome}</span>
+      <span class="dt">${s.data}</span>
+      <span class="rec">${rec ? "⭐ Recorde: "+rec.best+"%" : "Novo!"}</span>`;
+    b.onclick = ()=>{ subj = s; openSetup(); };
+    g.appendChild(b);
+  });
+}
+
+// ---------- setup ----------
+function openSetup(){
+  $("setupTitle").textContent = `${subj.emoji} ${subj.nome}`;
+  show("scrSetup");
+  updateAllCount();
+}
+function updateAllCount(){
+  const bank = window.BANCO && window.BANCO[subj.slug];
+  const n = bank ? (cfgLvl==="x" ? bank.length : bank.filter(q=>q.n===cfgLvl).length) : null;
+  $("allCount").textContent = n ? n+" questões" : "todas";
+}
+document.querySelectorAll("#lvlRow .chip").forEach(b=>{
+  b.onclick = ()=>{
+    document.querySelectorAll("#lvlRow .chip").forEach(x=>x.classList.remove("sel"));
+    b.classList.add("sel"); cfgLvl = b.dataset.lvl; updateAllCount();
+  };
+});
+document.querySelectorAll("#cntRow .chip").forEach(b=>{
+  b.onclick = ()=>{
+    document.querySelectorAll("#cntRow .chip").forEach(x=>x.classList.remove("sel"));
+    b.classList.add("sel"); cfgCnt = +b.dataset.cnt;
+  };
+});
+
+// ---------- data loading ----------
+const loaded = {};
+function loadBank(slug){
+  if(loaded[slug] || (window.BANCO && window.BANCO[slug])) return Promise.resolve();
+  return new Promise((ok, fail)=>{
+    const sc = document.createElement("script");
+    sc.src = "data/"+slug+".js?v=1";
+    sc.onload = ()=>{ loaded[slug]=true; ok(); };
+    sc.onerror = ()=> fail(new Error("falha ao carregar "+slug));
+    document.head.appendChild(sc);
+  });
+}
+
+// ---------- quiz ----------
+$("btnStart").onclick = async ()=>{
+  show("scrLoad");
+  try{ await loadBank(subj.slug); }
+  catch(e){
+    alert("Não consegui carregar as questões. Verifique a internet e tente de novo.");
+    show("scrSetup"); return;
+  }
+  const bank = (window.BANCO && window.BANCO[subj.slug]) || [];
+  let pool = cfgLvl==="x" ? bank : bank.filter(q=>q.n===cfgLvl);
+  if(!pool.length){ alert("Ainda não há questões desse nível."); show("scrSetup"); return; }
+  pool = shuffle(pool);
+  if(cfgCnt>0) pool = pool.slice(0, Math.min(cfgCnt, pool.length));
+  beginSession(pool);
+};
+function beginSession(qs){
+  session = qs.map(src=>{
+    const order = shuffle([0,1,2,3]);
+    return { src, alts: order.map(i=>src.a[i]), correct: order.indexOf(src.c), answered:false };
+  });
+  idx = 0; hits = 0; misses = 0; wrongs = [];
+  $("hTitle").textContent = `${subj.emoji} ${subj.nome}`;
+  $("hSub").textContent = LVL_NAME[cfgLvl] + " • " + session.length + (session.length===1?" questão":" questões");
+  show("scrQuiz");
+  renderQ();
+}
+function renderQ(){
+  const item = session[idx], q = item.src;
+  $("hCount").textContent = (idx+1)+"/"+session.length;
+  $("hOk").textContent = "✅ "+hits;
+  $("hNo").textContent = "❌ "+misses;
+  $("hBar").style.width = (idx/session.length*100)+"%";
+  $("qTopic").textContent = q.t;
+  $("qLvl").textContent = LVL_NAME[q.n];
+  $("qLvl").className = "tag lvl-"+q.n;
+  $("qText").textContent = q.q;
+  $("qVerdict").className = "verdict hidden";
+  $("btnWhy").classList.add("hidden");
+  $("qWhy").classList.add("hidden");
+  $("qWhy").textContent = "";
+  $("btnNext").classList.add("hidden");
+  const box = $("qAlts"); box.innerHTML = "";
+  "ABCD".split("").forEach((L,i)=>{
+    const b = document.createElement("button");
+    b.className = "alt";
+    b.innerHTML = `<span class="L">${L}</span><span>${esc(item.alts[i])}</span>`;
+    b.onclick = ()=>answer(i);
+    box.appendChild(b);
+  });
+}
+function answer(i){
+  const item = session[idx];
+  if(item.answered) return;
+  item.answered = true;
+  const btns = [...$("qAlts").children];
+  btns.forEach(b=>{ b.disabled = true; });
+  btns[item.correct].classList.add("ok");
+  const right = (i === item.correct);
+  if(right){ hits++; }
+  else{
+    misses++;
+    btns[i].classList.add("no");
+    btns.forEach((b,k)=>{ if(k!==i && k!==item.correct) b.classList.add("dim"); });
+    wrongs.push({ src:item.src, alts:item.alts, correct:item.correct, chosen:i });
+  }
+  $("hOk").textContent = "✅ "+hits;
+  $("hNo").textContent = "❌ "+misses;
+  $("hBar").style.width = ((idx+1)/session.length*100)+"%";
+  const v = $("qVerdict");
+  v.textContent = right ? "🎉 Acertou! Mandou bem!" : "😅 Ops! A certa era a "+"ABCD"[item.correct]+".";
+  v.className = "verdict " + (right?"ok":"no");
+  $("btnWhy").classList.remove("hidden");
+  $("btnNext").textContent = (idx === session.length-1) ? "Ver meu resultado 🏁" : "Próxima ➜";
+  $("btnNext").classList.remove("hidden");
+}
+$("btnWhy").onclick = ()=>{
+  const q = session[idx].src;
+  $("qWhy").textContent = q.e;
+  $("qWhy").classList.remove("hidden");
+  $("btnWhy").classList.add("hidden");
+};
+$("btnNext").onclick = ()=>{
+  if(idx === session.length-1){ showResult(); return; }
+  idx++; renderQ();
+};
+$("btnQuit").onclick = ()=>{
+  if(confirm("Sair do treino? Seu progresso desta rodada será perdido.")) goHome();
+};
+
+// ---------- result ----------
+function showResult(){
+  const total = session.length;
+  const pct = Math.round(hits/total*100);
+  const ringLen = 326.7;
+  $("ringFg").style.strokeDashoffset = ringLen;
+  $("ringTxt").textContent = pct+"%";
+  const fg = $("ringFg");
+  fg.setAttribute("stroke", pct>=70 ? "#16a34a" : pct>=50 ? "#f59e0b" : "#dc2626");
+  let emoji, msg;
+  if(pct===100){ emoji="🏆"; msg="PERFEITO! Você gabaritou!"; }
+  else if(pct>=90){ emoji="🌟"; msg="Sensacional! Tá prontíssimo!"; }
+  else if(pct>=70){ emoji="😄"; msg="Muito bom! Continue assim!"; }
+  else if(pct>=50){ emoji="💪"; msg="Bom começo! Revise os erros!"; }
+  else{ emoji="📚"; msg="Vamos revisar juntos? Você consegue!"; }
+  $("rEmoji").textContent = emoji;
+  $("rMsg").textContent = msg;
+  $("rOk").textContent = "✅ "+hits+(hits===1?" certa":" certas");
+  $("rNo").textContent = "❌ "+misses+(misses===1?" errada":" erradas");
+  const rec = setRec(subj.slug, pct);
+  $("rRecord").textContent = rec.isNew && rec.jogos>1 ? "⭐ NOVO RECORDE!" :
+    "Seu recorde em "+subj.nome+": "+rec.best+"% • Treinos: "+rec.jogos;
+  const wb = $("rWrongBox");
+  if(wrongs.length){
+    wb.classList.remove("hidden");
+    const list = $("rWrongList"); list.innerHTML = "";
+    wrongs.forEach((w,k)=>{
+      const b = document.createElement("button");
+      b.className = "wrongcard";
+      const qq = w.src.q.length>90 ? w.src.q.slice(0,90)+"…" : w.src.q;
+      b.innerHTML = `<b>${k+1}. ${esc(qq)}</b><span class="t">${esc(w.src.t)} • toque para rever 👀</span>`;
+      b.onclick = ()=>{ revIdx = k; show("scrReview"); renderReview(); };
+      list.appendChild(b);
+    });
+  } else {
+    wb.classList.add("hidden");
+  }
+  show("scrResult");
+  requestAnimationFrame(()=>{ fg.style.strokeDashoffset = ringLen*(1-pct/100); });
+  if(pct>=90) confetti();
+}
+function confetti(){
+  const ems = ["🎉","⭐","🎊","🏆","✨","💙"];
+  for(let i=0;i<40;i++){
+    const s = document.createElement("span");
+    s.className = "confetti";
+    s.textContent = ems[Math.floor(Math.random()*ems.length)];
+    s.style.left = Math.random()*100+"vw";
+    s.style.animationDuration = (2.2+Math.random()*2)+"s";
+    s.style.animationDelay = (Math.random()*0.8)+"s";
+    document.body.appendChild(s);
+    setTimeout(()=>s.remove(), 5200);
+  }
+}
+$("btnRetryWrong").onclick = ()=>{
+  const qs = shuffle(wrongs.map(w=>w.src));
+  beginSession(qs);
+};
+$("btnAgain").onclick = ()=>{ openSetup(); };
+$("btnHome").onclick = goHome;
+
+// ---------- review ----------
+function renderReview(){
+  const w = wrongs[revIdx];
+  $("revCount").textContent = (revIdx+1)+" de "+wrongs.length;
+  $("revTopic").textContent = w.src.t;
+  $("revText").textContent = w.src.q;
+  $("revMine").textContent = w.alts[w.chosen];
+  $("revRight").textContent = w.alts[w.correct];
+  $("revWhy").textContent = "💡 " + w.src.e;
+  $("btnRevPrev").disabled = (revIdx===0);
+  $("btnRevNext").textContent = (revIdx===wrongs.length-1) ? "Voltar ao resultado" : "Próxima →";
+}
+$("btnRevPrev").onclick = ()=>{ if(revIdx>0){ revIdx--; renderReview(); } };
+$("btnRevNext").onclick = ()=>{
+  if(revIdx===wrongs.length-1){ show("scrResult"); }
+  else{ revIdx++; renderReview(); }
+};
+$("btnBackResult").onclick = ()=>show("scrResult");
+$("btnBackHome").onclick = goHome;
+
+function goHome(){
+  subj = null;
+  $("hTitle").textContent = "🏆 Treino de Provas";
+  $("hSub").textContent = "2ªs avaliações do 2º trimestre — 5º ano";
+  renderHome();
+  show("scrHome");
+}
+
+renderHome();
+</script>
+</body>
+</html>

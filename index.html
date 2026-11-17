@@ -54,6 +54,10 @@
   .subj .nm{font-weight:800;font-size:15.5px}
   .subj .dt{font-size:12px;color:var(--muted);font-weight:600}
   .subj .rec{font-size:11.5px;color:var(--primary-d);font-weight:700}
+  .subj.today{box-shadow:0 0 0 3px var(--ac),var(--shadow)}
+  .subj.today .dt{color:var(--ac);font-weight:800;font-size:12.5px}
+  .subj.past .dt{font-size:11.5px}
+  .subj:disabled{opacity:.55;cursor:default}
   .chiprow{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 2px}
   .chip{
     flex:1 1 calc(50% - 8px);min-height:52px;border-radius:14px;border:2px solid #e2e8f0;
@@ -145,7 +149,7 @@
   <div class="hrow">
     <div>
       <h1 id="hTitle">🏆 Treino de Provas</h1>
-      <div class="sub" id="hSub">2ªs avaliações do 2º trimestre — 5º ano</div>
+      <div class="sub" id="hSub">2ªs avaliações do 3º trimestre — 5º ano</div>
     </div>
     <button class="xbtn hidden" id="btnQuit" aria-label="Sair do treino">✕</button>
   </div>
@@ -263,14 +267,23 @@
 </div>
 
 <script>
+// Rodada atual: 2ªs avaliações do 3º trimestre de 2026.
+// dia = data da prova (AAAA-MM-DD); seg = 2ª chamada; pronto = banco publicado.
+const RODADA = "3tri";
+const BUILD = "3tri-1";   // mude a cada publicação para o celular baixar os bancos novos
 const SUBJECTS = [
-  {slug:"portugues",  nome:"Português",  emoji:"📖", cor:"#dc2626", data:"prova 17/8"},
-  {slug:"historia",   nome:"História",   emoji:"🏺", cor:"#b45309", data:"prova 18/8"},
-  {slug:"matematica", nome:"Matemática", emoji:"🔢", cor:"#2563eb", data:"prova 19/8"},
-  {slug:"ingles",     nome:"Inglês",     emoji:"🦁", cor:"#16a34a", data:"prova 20/8"},
-  {slug:"ciencias",   nome:"Ciências",   emoji:"🫀", cor:"#7c3aed", data:"prova 21/8"},
-  {slug:"geografia",  nome:"Geografia",  emoji:"🗺️", cor:"#0d9488", data:"prova 24/8"},
+  {slug:"portugues",  nome:"Português",  emoji:"📖", cor:"#dc2626", dia:"2026-11-16", seg:"26/11", pronto:false},
+  {slug:"historia",   nome:"História",   emoji:"🏺", cor:"#b45309", dia:"2026-11-17", seg:"30/11", pronto:true},
+  {slug:"matematica", nome:"Matemática", emoji:"🔢", cor:"#2563eb", dia:"2026-11-18", seg:"27/11", pronto:false},
+  {slug:"ingles",     nome:"Inglês",     emoji:"🔮", cor:"#16a34a", dia:"2026-11-23", seg:"26/11", pronto:false},
+  {slug:"geografia",  nome:"Geografia",  emoji:"🗺️", cor:"#0d9488", dia:"2026-11-24", seg:"30/11", pronto:false},
+  {slug:"ciencias",   nome:"Ciências",   emoji:"⚡", cor:"#7c3aed", dia:"2026-11-25", seg:"27/11", pronto:false},
 ];
+function isoHoje(offset){
+  const d = new Date(); d.setDate(d.getDate()+(offset||0));
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+function ddmm(iso){ return iso.slice(8,10)+"/"+iso.slice(5,7); }
 const LVL_NAME = {f:"🟢 Fácil", m:"🟡 Médio", d:"🔴 Difícil", x:"🌈 Misturado"};
 
 const $ = id => document.getElementById(id);
@@ -299,7 +312,7 @@ let wrongs = [];          // [{src, alts, correct, chosen}]
 let revIdx = 0;
 
 // ---------- persistence ----------
-function recKey(slug){ return "treino5_rec_"+slug; }
+function recKey(slug){ return "treino5_"+RODADA+"_rec_"+slug; }
 function getRec(slug){ try{ return JSON.parse(localStorage.getItem(recKey(slug))||"null"); }catch(e){ return null; } }
 function setRec(slug, pct){
   const cur = getRec(slug);
@@ -312,14 +325,27 @@ function setRec(slug, pct){
 // ---------- home ----------
 function renderHome(){
   const g = $("subjGrid"); g.innerHTML = "";
-  SUBJECTS.forEach(s=>{
+  const hoje = isoHoje(0), amanha = isoHoje(1);
+  // provas que ainda vão acontecer primeiro (por data), depois as que já passaram
+  const ordem = SUBJECTS.slice().sort((a,b)=>{
+    const pa = a.dia < hoje, pb = b.dia < hoje;
+    return pa!==pb ? (pa?1:-1) : a.dia.localeCompare(b.dia);
+  });
+  ordem.forEach(s=>{
     const b = document.createElement("button");
     b.className = "subj"; b.style.setProperty("--ac", s.cor);
+    let quando;
+    if(s.dia===hoje){ quando = "📌 PROVA HOJE!"; b.classList.add("today"); }
+    else if(s.dia===amanha){ quando = "prova amanhã ("+ddmm(s.dia)+")"; }
+    else if(s.dia<hoje){ quando = "foi "+ddmm(s.dia)+" • 2ª chamada "+s.seg; b.classList.add("past"); }
+    else { quando = "prova "+ddmm(s.dia); }
     const rec = getRec(s.slug);
+    const status = !s.pronto ? "⏳ em preparação" : rec ? "⭐ Recorde: "+rec.best+"%" : "Novo!";
     b.innerHTML = `<span class="em">${s.emoji}</span><span class="nm">${s.nome}</span>
-      <span class="dt">${s.data}</span>
-      <span class="rec">${rec ? "⭐ Recorde: "+rec.best+"%" : "Novo!"}</span>`;
-    b.onclick = ()=>{ subj = s; openSetup(); };
+      <span class="dt">${quando}</span>
+      <span class="rec">${status}</span>`;
+    if(s.pronto){ b.onclick = ()=>{ subj = s; openSetup(); }; }
+    else { b.disabled = true; }
     g.appendChild(b);
   });
 }
@@ -354,7 +380,7 @@ function loadBank(slug){
   if(loaded[slug] || (window.BANCO && window.BANCO[slug])) return Promise.resolve();
   return new Promise((ok, fail)=>{
     const sc = document.createElement("script");
-    sc.src = "data/"+slug+".js?v=1";
+    sc.src = "data/"+slug+".js?v="+BUILD;
     sc.onload = ()=>{ loaded[slug]=true; ok(); };
     sc.onerror = ()=> fail(new Error("falha ao carregar "+slug));
     document.head.appendChild(sc);
@@ -534,7 +560,7 @@ $("btnBackHome").onclick = goHome;
 function goHome(){
   subj = null;
   $("hTitle").textContent = "🏆 Treino de Provas";
-  $("hSub").textContent = "2ªs avaliações do 2º trimestre — 5º ano";
+  $("hSub").textContent = "2ªs avaliações do 3º trimestre — 5º ano";
   renderHome();
   show("scrHome");
 }

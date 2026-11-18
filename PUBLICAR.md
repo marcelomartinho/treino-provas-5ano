@@ -1,61 +1,32 @@
 # Como publicar o site
 
-O site está pronto em `C:\Dev\Gustavo\treino-provas-5ano`. Falta só autorizar a Vercel.
+Site no ar (GitHub Pages): https://marcelomartinho.github.io/treino-provas-5ano/
+Repositório: `marcelomartinho/treino-provas-5ano` (branch `main`). Cada push atualiza o site em ~1 minuto.
 
-## Opção 1 — login pelo navegador (mais simples)
+## Nova rodada de provas
 
-Abra um terminal nesta pasta e rode:
+1. Mova os bancos antigos para `arquivo/<rodada>/`.
+2. Crie `data/<slug>.js` (formato abaixo) — meta 70 fáceis + 70 médias + 70 difíceis.
+3. Valide: `node tools/validar.js` (ou `node tools/validar.js historia` para um só).
+4. No `index.html`, ajuste `RODADA`, as datas em `SUBJECTS` (`dia`, `seg`) e marque `pronto:true`
+   nas matérias que já podem aparecer (as outras ficam com cadeado "em breve").
+5. Mude `BUILD` a cada publicação, para o celular baixar os bancos novos.
+6. Publique: `git add index.html data/<slug>.js && git commit -m "..." && git push`.
 
-```bash
-vercel login
+## Formato de cada questão
+
+```js
+window.BANCO.historia = [
+  {n:"f", t:"Tópico", q:"Enunciado?", a:["A","B","C","D"], c:0, e:"Explicação para a criança."},
+];
 ```
 
-A CLI mostra um link tipo `https://vercel.com/oauth/device?user_code=XXXX-XXXX`.
-Abra o link, clique em **Confirm** e volte ao terminal. Depois:
+`n` = nível (f/m/d), `c` = índice da correta. O app embaralha questões e alternativas.
 
-```bash
-vercel deploy --prod --yes
-```
-
-A URL pública aparece no final (algo como `https://treino-provas-5ano.vercel.app`).
-
-## Opção 2 — token (não expira)
-
-1. Crie um token em https://vercel.com/account/tokens
-2. Rode:
-
-```bash
-vercel deploy --prod --yes --token SEU_TOKEN_AQUI --scope mmartinhobr-7084s-projects
-```
-
-> O `--scope` é necessário porque a conta tem time próprio e o modo não-interativo
-> não assume um padrão. Foi assim nos deploys dos sites de revisão de junho.
-
-## Republicar depois de atualizar as questões
-
-Mesmo comando, mesma URL:
-
-```bash
-vercel deploy --prod --yes
-```
-
-## Testar localmente antes
+## Testar localmente
 
 ```bash
 python -m http.server 8123 --directory C:/Dev/Gustavo/treino-provas-5ano
 ```
 
-Depois abra `http://localhost:8123` no navegador.
-
-## Estrutura
-
-- `index.html` — o app do quiz (tudo embutido: layout, lógica, placar, revisão de erros)
-- `data/portugues.js` — 210 questões (prova 17/8)
-- `data/historia.js` — 211 questões (prova 18/8)
-- `data/matematica.js` — prova 19/8
-- `data/ingles.js` — 210 questões (prova 20/8)
-- `data/ciencias.js` — prova 21/8
-- `data/geografia.js` — prova 24/8
-
-Cada arquivo de matéria é carregado só quando Gustavo escolhe aquela matéria, para
-economizar dados no celular.
+Abra `http://localhost:8123` (modo celular do navegador, 360×740).
